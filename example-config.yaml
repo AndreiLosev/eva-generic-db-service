@@ -1,0 +1,21 @@
+bus:
+  path: localhost:10001
+command: svc/eva-generic-db-service
+react_to_fail: true
+timeout:
+  startup: 60.0
+user: nobody
+workers: 1
+config:
+  db: "postgres://eva-user:12345@127.0.0.1:5432/eva-db"
+  unix: false
+  ssl: false
+  columns:
+    - name: id
+      type: BIGINT
+      primary_key: true
+    - name: time
+      type: TIMESTAMP
+      not_null: true
+    - name: value
+      type: VARCHAR(255)
