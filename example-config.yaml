@@ -3,7 +3,7 @@ bus:
 command: svc/eva-generic-db-service
 react_to_fail: true
 timeout:
-  startup: 60.0
+  startup: 360.0
 user: nobody
 workers: 1
 config:
@@ -12,11 +12,28 @@ config:
   ssl: false
   columns:
     - name: id
-      type: BIGINT
+      type: BIGSERIAL
       primary_key: true
-    - name: time
-      type: TIMESTAMP
+    - name: mp
+      type: TEXT
       not_null: true
-      index: true
-    - name: value
-      type: VARCHAR(255)
+    - name: code_rc
+      type: TEXT
+      not_null: true
+      unique: true
+    - name: name
+      type: TEXT
+      not_null: true
+    - name: multiplicity
+      type: INTEGER
+      default: 1
+      not_null: true
+    - name: packagingType
+      type: TEXT
+    - name: barcode
+      type: TEXT
+      unique: true
+      not_null: true
+    - name: subject
+      type: TEXT
+      not_null: true

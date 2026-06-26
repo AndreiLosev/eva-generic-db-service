@@ -46,7 +46,7 @@ class ColumnDefinition {
   });
 
   factory ColumnDefinition.fromMap(Map map) {
-    final name = map['name'] as String;
+    final name = (map['name'] as String).toLowerCase();
     final type = map['type'] as String;
     _validateIdentifier(name);
     _validateType(type);
