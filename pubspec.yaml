@@ -6,9 +6,9 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
-  eva_sdk: ^0.4.0
   postgres: ^3.5.6
   path: ^1.9.0
+  eva_sdk: ^0.5.0
 
 dev_dependencies:
   lints: ^6.0.0

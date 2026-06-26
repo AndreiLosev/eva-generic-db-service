@@ -11,29 +11,33 @@ config:
   unix: false
   ssl: false
   columns:
-    - name: id
-      type: BIGSERIAL
+    - name: "id"
       primary_key: true
-    - name: mp
-      type: TEXT
+      type: "BIGSERIAL"
+    - name: "mp"
       not_null: true
-    - name: code_rc
-      type: TEXT
+      type: "TEXT"
+    - name: "code_rc"
       not_null: true
+      type: "INTEGER"
       unique: true
-    - name: name
-      type: TEXT
+    - name: "name"
       not_null: true
-    - name: multiplicity
-      type: INTEGER
-      default: 1
+      type: "TEXT"
+    - default: 1
+      name: "multiplicity"
       not_null: true
-    - name: packagingType
-      type: TEXT
-    - name: barcode
-      type: TEXT
+      type: "INTEGER"
+    - name: "packaging_type"
+      type: "TEXT"
+    - name: "barcode"
+      not_null: true
+      type: "TEXT"
       unique: true
+    - name: "subject"
       not_null: true
-    - name: subject
-      type: TEXT
+      type: "TEXT"
+    - name: "created_at"
+      type: "TIMESTAMPTZ"
       not_null: true
+      default: "now()"
