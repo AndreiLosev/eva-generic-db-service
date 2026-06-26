@@ -1,4 +1,5 @@
 import 'package:eva_generic_db_service/db/data_base_client.dart';
+import 'package:eva_generic_db_service/eapi/sanitize_datetime.dart';
 import 'package:eva_sdk/eva_sdk.dart';
 
 class Insert {
@@ -6,7 +7,9 @@ class Insert {
   static const description = 'insert row into table';
 
   Future<Map<String, dynamic>?> call(Map<String, dynamic> params) async {
-    return DataBaseClient.getInstance().insert(params);
+    final afected = await DataBaseClient.getInstance().insert(params);
+    sanitizeDateTime([afected['row']]);
+    return afected;
   }
 
   static ServiceMethod createMethod() {
