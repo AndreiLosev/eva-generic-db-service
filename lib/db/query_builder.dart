@@ -9,7 +9,11 @@ class BuiltQuery {
 }
 
 class QueryBuilder {
-  static const operators = {'=', '!=', '>', '>=', '<', '<='};
+  static const comparisonOperators = {'=', '!=', '>', '>=', '<', '<='};
+  static const patternOperators = {
+    'like': 'LIKE',
+    'not like': 'NOT LIKE',
+  };
 
   final TableSchema schema;
 
@@ -210,7 +214,27 @@ class QueryBuilder {
     final value = condition[2];
 
     _validateColumn(column);
-    if (!operators.contains(operator)) {
+
+    final patternOperator = patternOperators[operator.toLowerCase().trim()];
+    if (patternOperator != null) {
+      if (value == null) {
+        throw EvaError(
+          EvaErrorKind.invalidParams,
+          'operator $operator with null requires = or !=',
+        );
+      }
+      if (value is! String) {
+        throw EvaError(
+          EvaErrorKind.invalidParams,
+          'like operator requires string value',
+        );
+      }
+      final paramName = nextParamName();
+      parameters[paramName] = value;
+      return '$column $patternOperator @$paramName';
+    }
+
+    if (!comparisonOperators.contains(operator)) {
       throw EvaError(EvaErrorKind.invalidParams, 'unsupported operator: $operator');
     }
 

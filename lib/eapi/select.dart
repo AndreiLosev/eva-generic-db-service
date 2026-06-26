@@ -31,12 +31,12 @@ class Select {
       ..optional(
         'where',
         'list',
-        '[column, operator, value] or list of conditions',
+        '[column, operator, value] — operators: =, !=, >, >=, <, <=, like, not like',
       )
       ..optional(
         'orWhere',
         'list',
-        '[column, operator, value] or list of conditions',
+        '[column, operator, value] — operators: =, !=, >, >=, <, <=, like, not like',
       )
       ..optional('offset', 'u64', 'default: 0')
       ..optional('limit', 'u64')

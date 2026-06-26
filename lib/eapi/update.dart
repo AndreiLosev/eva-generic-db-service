@@ -13,6 +13,6 @@ class Update {
   static ServiceMethod createMethod() {
     return ServiceMethod(name, Update().call, description)
       ..required('set', 'dict', 'column name to value map')
-      ..required('where', 'list', '[column, operator, value] or list of conditions');
+      ..required('where', 'list', '[column, operator, value] — operators: =, !=, >, >=, <, <=, like, not like');
   }
 }

@@ -12,6 +12,6 @@ class Delete {
 
   static ServiceMethod createMethod() {
     return ServiceMethod(name, Delete().call, description)
-      ..required('where', 'list', '[column, operator, value] or list of conditions');
+      ..required('where', 'list', '[column, operator, value] — operators: =, !=, >, >=, <, <=, like, not like');
   }
 }

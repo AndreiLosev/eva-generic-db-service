@@ -118,6 +118,51 @@ void main() {
         throwsA(isA<EvaError>()),
       );
     });
+
+    test('like generates parameterized LIKE clause', () {
+      final query = qb.buildSelect({
+        'where': ['value', 'like', '%abc%'],
+      });
+
+      expect(
+        query.sql,
+        'SELECT * FROM softkip_generic_db WHERE value LIKE @p0',
+      );
+      expect(query.parameters, {'p0': '%abc%'});
+    });
+
+    test('not like generates parameterized NOT LIKE clause', () {
+      final query = qb.buildSelect({
+        'where': ['value', 'NOT LIKE', 'test%'],
+      });
+
+      expect(
+        query.sql,
+        'SELECT * FROM softkip_generic_db WHERE value NOT LIKE @p0',
+      );
+      expect(query.parameters, {'p0': 'test%'});
+    });
+
+    test('like with null throws', () {
+      expect(
+        () => qb.buildSelect({'where': ['value', 'like', null]}),
+        throwsA(isA<EvaError>()),
+      );
+    });
+
+    test('like with non-string value throws', () {
+      expect(
+        () => qb.buildSelect({'where': ['value', 'like', 42]}),
+        throwsA(isA<EvaError>()),
+      );
+    });
+
+    test('unsupported pattern operator throws', () {
+      expect(
+        () => qb.buildSelect({'where': ['value', 'ilike', '%x%']}),
+        throwsA(isA<EvaError>()),
+      );
+    });
   });
 
   group('QueryBuilder insert', () {
