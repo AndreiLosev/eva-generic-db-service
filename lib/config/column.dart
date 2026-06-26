@@ -32,6 +32,7 @@ class ColumnDefinition {
   final bool primaryKey;
   final bool notNull;
   final bool unique;
+  final bool index;
   final String? defaultValue;
 
   ColumnDefinition({
@@ -40,6 +41,7 @@ class ColumnDefinition {
     this.primaryKey = false,
     this.notNull = false,
     this.unique = false,
+    this.index = false,
     this.defaultValue,
   });
 
@@ -54,6 +56,7 @@ class ColumnDefinition {
       primaryKey: map['primary_key'] == true,
       notNull: map['not_null'] == true,
       unique: map['unique'] == true,
+      index: map['index'] == true,
       defaultValue: map['default']?.toString(),
     );
   }
@@ -118,6 +121,10 @@ class ColumnDefinition {
 
   String uniqueConstraintName(String tableName) =>
       '${tableName}_${name}_unique';
+
+  String indexName(String tableName) => '${tableName}_${name}_idx';
+
+  bool get shouldCreateIndex => index && !primaryKey && !unique;
 }
 
 class ExistingColumn {

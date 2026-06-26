@@ -9,7 +9,11 @@ class SchemaMigrator {
 
   Future<void> migrate() async {
     final current = await _fetchCurrentColumns();
-    final statements = buildAlterStatements(schema, current);
+    final existingIndexes = await _fetchExistingIndexes();
+    final statements = [
+      ...buildAlterStatements(schema, current),
+      ...buildIndexStatements(schema, existingIndexes),
+    ];
     if (statements.isEmpty) return;
 
     await connection.runTx((tx) async {
@@ -17,6 +21,19 @@ class SchemaMigrator {
         await tx.execute(sql, queryMode: QueryMode.simple);
       }
     });
+  }
+
+  Future<Set<String>> _fetchExistingIndexes() async {
+    final result = await connection.execute(
+      Sql.named('''
+SELECT indexname
+FROM pg_indexes
+WHERE schemaname = 'public' AND tablename = @table
+'''),
+      parameters: {'table': schema.tableName},
+    );
+
+    return result.map((row) => row.toColumnMap()['indexname'] as String).toSet();
   }
 
   Future<List<ExistingColumn>> _fetchCurrentColumns() async {
@@ -179,6 +196,29 @@ WHERE tc.table_schema = 'public'
     }
 
     return [...addColumn, ...alterColumn, ...constraints];
+  }
+
+  static List<String> buildIndexStatements(
+    TableSchema desired,
+    Set<String> existingIndexes,
+  ) {
+    final statements = <String>[];
+
+    for (final column in desired.columns) {
+      final indexName = column.indexName(desired.tableName);
+      if (column.shouldCreateIndex) {
+        if (!existingIndexes.contains(indexName)) {
+          statements.add(
+            'CREATE INDEX IF NOT EXISTS $indexName '
+            'ON ${desired.tableName} (${column.name})',
+          );
+        }
+      } else if (existingIndexes.contains(indexName)) {
+        statements.add('DROP INDEX IF EXISTS $indexName');
+      }
+    }
+
+    return statements;
   }
 
   static void _validatePrimaryKey(

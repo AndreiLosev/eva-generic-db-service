@@ -17,5 +17,6 @@ config:
     - name: time
       type: TIMESTAMP
       not_null: true
+      index: true
     - name: value
       type: VARCHAR(255)

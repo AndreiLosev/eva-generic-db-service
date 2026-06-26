@@ -229,4 +229,74 @@ void main() {
       expect(SchemaMigrator.buildAlterStatements(desired, current), isEmpty);
     });
   });
+
+  group('SchemaMigrator.buildIndexStatements', () {
+    test('creates index when index is true', () {
+      final desired = _schema([
+        ColumnDefinition(name: 'id', type: 'SERIAL', primaryKey: true),
+        ColumnDefinition(name: 'time', type: 'TIMESTAMP', notNull: true, index: true),
+        ColumnDefinition(name: 'value', type: 'VARCHAR(255)'),
+      ]);
+
+      final statements = SchemaMigrator.buildIndexStatements(desired, {});
+
+      expect(statements, [
+        'CREATE INDEX IF NOT EXISTS softkip_generic_db_time_idx '
+        'ON softkip_generic_db (time)',
+      ]);
+    });
+
+    test('creates index when columns match but index is missing', () {
+      final desired = _schema([
+        ColumnDefinition(name: 'id', type: 'SERIAL', primaryKey: true),
+        ColumnDefinition(name: 'time', type: 'TIMESTAMP', notNull: true, index: true),
+      ]);
+
+      final statements = SchemaMigrator.buildIndexStatements(desired, {});
+
+      expect(statements, hasLength(1));
+      expect(statements.first, contains('CREATE INDEX IF NOT EXISTS'));
+    });
+
+    test('drops index when flag is removed', () {
+      final desired = _schema([
+        ColumnDefinition(name: 'id', type: 'SERIAL', primaryKey: true),
+        ColumnDefinition(name: 'time', type: 'TIMESTAMP', notNull: true),
+      ]);
+
+      final statements = SchemaMigrator.buildIndexStatements(desired, {
+        'softkip_generic_db_time_idx',
+      });
+
+      expect(statements, ['DROP INDEX IF EXISTS softkip_generic_db_time_idx']);
+    });
+
+    test('skips index for primary key column', () {
+      final desired = _schema([
+        ColumnDefinition(name: 'id', type: 'SERIAL', primaryKey: true, index: true),
+      ]);
+
+      expect(SchemaMigrator.buildIndexStatements(desired, {}), isEmpty);
+    });
+
+    test('skips index for unique column', () {
+      final desired = _schema([
+        ColumnDefinition(name: 'id', type: 'SERIAL', primaryKey: true),
+        ColumnDefinition(name: 'value', type: 'VARCHAR(255)', unique: true, index: true),
+      ]);
+
+      expect(SchemaMigrator.buildIndexStatements(desired, {}), isEmpty);
+    });
+
+    test('does nothing when index already exists', () {
+      final desired = _schema([
+        ColumnDefinition(name: 'time', type: 'TIMESTAMP', index: true),
+      ]);
+
+      expect(
+        SchemaMigrator.buildIndexStatements(desired, {'softkip_generic_db_time_idx'}),
+        isEmpty,
+      );
+    });
+  });
 }
